@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"cloud.google.com/go/pubsub"
 )
@@ -35,14 +36,14 @@ func SlackIngester(w http.ResponseWriter, r *http.Request) {
 	case "url_verification":
 		fmt.Fprintf(w, j.Challenge)
 	case "event_callback":
-		fmt.Println("data: %s", data)
-
-		client, err := pubsub.NewClient(ctx, "devs-sandbox")
+		fmt.Printf("$GCP_PROJECT: %v, $PUBSUB_TOPIC: %v\n", os.Getenv("GCP_PROJECT"), os.Getenv("PUBSUB_TOPIC"))
+		fmt.Printf("data: %s\n", data)
+		client, err := pubsub.NewClient(ctx, os.Getenv("GCP_PROJECT"))
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		topic := client.Topic("ruby-slackbot")
+		topic := client.Topic(os.Getenv("PUBSUB_TOPIC"))
 
 		res := topic.Publish(ctx, &pubsub.Message{
 			Data: data,
@@ -51,19 +52,10 @@ func SlackIngester(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println("msgID: %~v", msgID)
+		fmt.Printf("msgID: %s\n", msgID)
 
 		fmt.Fprintf(w, "ok")
 	default:
 		fmt.Fprintf(w, "ok")
 	}
 }
-
-/*
-func main() {
-	fmt.Println("Starting")
-	http.HandleFunc("/", SlackIngester)
-
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
-*/
