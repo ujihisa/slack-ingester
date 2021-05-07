@@ -1,8 +1,5 @@
-module example.com/cloudfunction
+module github.com/ujihisa/slack-ingester
 
 go 1.13
 
-require (
-	cloud.google.com/go/pubsub v1.10.3
-	golang.org/x/mod v0.4.1 // indirect
-)
+require cloud.google.com/go/pubsub v1.10.3

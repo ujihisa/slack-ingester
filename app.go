@@ -1,8 +1,10 @@
-package main
+package app
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -16,6 +18,7 @@ type SlackJson struct {
 
 func SlackIngester(w http.ResponseWriter, r *http.Request) {
 	var j SlackJson
+	ctx := context.Background()
 
 	err := json.NewDecoder(r.Body).Decode(&j)
 	if err != nil {
@@ -27,19 +30,26 @@ func SlackIngester(w http.ResponseWriter, r *http.Request) {
 	case "url_verification":
 		fmt.Fprintf(w, j.Challenge)
 	case "event_callback":
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		client, err := pubsub.NewClient(ctx, "devs-sandbox")
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		topic := client.Topic("ruby-slackbot")
+
 		res := topic.Publish(ctx, &pubsub.Message{
-			Data: []byte(r.Body),
+			Data: data,
 		})
 		msgID, err := res.Get(ctx)
 		if err != nil {
 			log.Fatal(err)
 		}
+		fmt.Println("msgID: %~v", msgID)
 
 		fmt.Fprintf(w, "ok")
 	default:
@@ -47,9 +57,11 @@ func SlackIngester(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/*
 func main() {
 	fmt.Println("Starting")
 	http.HandleFunc("/", SlackIngester)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
+*/
