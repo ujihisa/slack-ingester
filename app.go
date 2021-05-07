@@ -38,6 +38,13 @@ func SlackIngester(w http.ResponseWriter, r *http.Request) {
 	case "event_callback":
 		fmt.Printf("$GCP_PROJECT: %v, $PUBSUB_TOPIC: %v\n", os.Getenv("GCP_PROJECT"), os.Getenv("PUBSUB_TOPIC"))
 		fmt.Printf("data: %s\n", data)
+
+		// Make sure it's not a retry
+		if _, ok := r.Header["X-Slack-Retry-Num"]; ok {
+			fmt.Fprintf(w, "ok")
+			return
+		}
+
 		client, err := pubsub.NewClient(ctx, os.Getenv("GCP_PROJECT"))
 		if err != nil {
 			log.Fatal(err)
