@@ -20,7 +20,12 @@ func SlackIngester(w http.ResponseWriter, r *http.Request) {
 	var j SlackJson
 	ctx := context.Background()
 
-	err := json.NewDecoder(r.Body).Decode(&j)
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = json.Unmarshal([]byte(data), &j)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -30,10 +35,7 @@ func SlackIngester(w http.ResponseWriter, r *http.Request) {
 	case "url_verification":
 		fmt.Fprintf(w, j.Challenge)
 	case "event_callback":
-		data, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
+		fmt.Println("data: %s", data)
 
 		client, err := pubsub.NewClient(ctx, "devs-sandbox")
 		if err != nil {
