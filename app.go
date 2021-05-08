@@ -12,13 +12,13 @@ import (
 	"cloud.google.com/go/pubsub"
 )
 
-type SlackJson struct {
+type SlackJSON struct {
 	Type      string
 	Challenge string
 }
 
 func SlackIngester(w http.ResponseWriter, r *http.Request) {
-	var j SlackJson
+	var j SlackJSON
 	ctx := context.Background()
 
 	data, err := ioutil.ReadAll(r.Body)
