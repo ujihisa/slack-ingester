@@ -7,6 +7,13 @@ Slack -> Google Cloud Function -> Google Cloud Pub/Sub -> Google Cloud Run -> Sl
 
 ```
 
+## Upgrade dependency libraries
+
+```bash
+go get -u
+go mod tidy
+```
+
 ## Deploy
 
 manual
