@@ -20,7 +20,7 @@ manual
 
 ```
 git push
-/opt/google-cloud-cli/bin/gcloud functions deploy slack-ingester --source https://source.developers.google.com/projects/devs-sandbox/repos/github_ujihisa_slack-ingester/moveable-aliases/master/paths/ --runtime go122
+/opt/google-cloud-cli/bin/gcloud functions deploy slack-ingester --source https://source.developers.google.com/projects/devs-sandbox/repos/github_ujihisa_slack-ingester/moveable-aliases/master/paths/ --runtime go121
 ```
 
 ## LICENCE
